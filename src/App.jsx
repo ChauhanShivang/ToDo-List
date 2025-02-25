@@ -7,24 +7,18 @@ import { MdDelete } from "react-icons/md";
 function App() {
 
   const [ToDo, setToDo] = useState("")
-  const [ToDos, setToDos] = useState([])
+  const [ToDos, setToDos] = useState(() => {
+    const savedToDos = localStorage.getItem("ToDos");
+    return savedToDos ? JSON.parse(savedToDos) : [];
+  });
 
   useEffect(() => {
-    let ToDoString = localStorage.getItem("ToDos")
-    if(ToDoString){
-      let ToDos = JSON.parse(localStorage.getItem("ToDos"))
-      setToDos(ToDos)
-    }
-  }, [])
-
-  const saveToLocalStorage = (params) => {
-    localStorage.setItem("ToDos", JSON.stringify(ToDos))
-  }
+    localStorage.setItem("ToDos", JSON.stringify(ToDos));
+  }, [ToDos]); 
 
   const handleAdd = () => {
     setToDos([...ToDos, { id: uuidv4(), ToDo, isCompleted: false }])
     setToDo("")
-    saveToLocalStorage()
   }
 
   const handleEdit = (e, id) => {
@@ -34,7 +28,6 @@ function App() {
       return item.id !== id
     })
     setToDos(newToDos)
-    saveToLocalStorage()
   }
 
   const handleDelete = (e, id) => {
@@ -42,7 +35,6 @@ function App() {
       return item.id !== id
     })
     setToDos(newToDos)
-    saveToLocalStorage()
   }
   
   const handleChange = (e) => {
@@ -57,7 +49,6 @@ function App() {
     let newToDos = [...ToDos]
     newToDos[index].isCompleted = !newToDos[index].isCompleted
     setToDos(newToDos)
-    saveToLocalStorage()
   }
 
   return (
@@ -80,7 +71,7 @@ function App() {
 
             return <div key={item.id} className='m-2 flex justify-between gap-6'>
                 <div className='check content-center'><input name={item.id} onChange={handleCheckBox} checked={item.isCompleted} type="checkbox" className='w-5 h-5'/></div>
-                <div className={item.isCompleted ? "line-through" : ""}>{item.ToDo}</div>
+                <div className={`${item.isCompleted ? "line-through" : ""} content-center`}>{item.ToDo}</div>
                 <div className='btn gap-4 h-10 flex items-center justify-center'>
                     <button onClick={(e)=>{handleEdit(e, item.id)}} className='bg-blue-950 text-white p-2 rounded-xl font-bold'><FaEdit /></button>
                     <button onClick={(e)=>{handleDelete(e, item.id)}} className='bg-blue-950 text-white p-2 rounded-xl font-bold'><MdDelete />
